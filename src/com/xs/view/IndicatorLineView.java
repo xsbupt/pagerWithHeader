@@ -23,9 +23,15 @@ public class IndicatorLineView extends View {
 
     private int mOffset = 0;
 
+    private int mTotalOffset = 0;
+
+    private int mRemain = 0;
+
     private float mLastPercent;
 
     private boolean mPullLeft = false;
+
+    public boolean mRenderFinsh = false;
 
     /**
      * the bar color
@@ -51,6 +57,7 @@ public class IndicatorLineView extends View {
     public void setLine(int start, int end) {
         mLeft = start;
         mRight = end;
+        mRenderFinsh = false;
         invalidate();
     }
 
@@ -59,6 +66,7 @@ public class IndicatorLineView extends View {
         mOffset = isPullLeft ? nextLength - mCurrentLength : mCurrentLength - nextLength;
         mDesireLeft = isPullLeft ? mLeft + total : mLeft - total;
         mDesireRight = isPullLeft ? mRight+total+mOffset : mRight-total-mOffset;
+        mRemain = mTotalOffset = Math.abs(total+mOffset);
         mPullLeft = isPullLeft;
     }
 
@@ -66,20 +74,25 @@ public class IndicatorLineView extends View {
         this.mLastPercent = lastPercent;
     }
 
-    public void scrollBy(int by, float nowPercent) {
+    public void scrollBy(int by, float percent) {
         mLeft += by;
-        int temp = (int)((nowPercent-mLastPercent)* mOffset);
+        int tempTotaloffsetX = mTotalOffset == 0 ? 0 : mTotalOffset+20;
+        int temp = (int) (tempTotaloffsetX * percent);
         if (Math.abs(temp) > 0) {
-            mLastPercent = nowPercent;
+            int tempRemain = mRemain;
+            mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
+            int tempHeadMove = mRemain >=0 ? temp : (mPullLeft ? tempRemain: -tempRemain);
+            tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
+            if (tempRemain>=0) {
+                mRight += tempHeadMove;
+            }
         }
-        mRight = mRight + by + temp;
         if (mPullLeft) {
             mLeft = mLeft < mDesireLeft ? mLeft : mDesireLeft;
-            mRight = mRight < mDesireRight ? mRight : mDesireRight;
         } else {
             mLeft = mLeft > mDesireLeft ? mLeft : mDesireLeft;
-            mRight = mRight > mDesireRight ? mRight : mDesireRight;
         }
+
         invalidate();
     }
 
@@ -99,5 +112,7 @@ public class IndicatorLineView extends View {
         canvas.drawRect(new Rect(0, 0, mLeft, getHeight()), gray);
         canvas.drawRect(new Rect(mLeft, 0, mRight, getHeight()), paint);
         canvas.drawRect(new Rect(mRight, 0, getWidth(), getHeight()), gray);
+
+        mRenderFinsh = true;
     }
 }

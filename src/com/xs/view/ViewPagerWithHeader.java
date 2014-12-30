@@ -55,7 +55,7 @@ public class ViewPagerWithHeader extends LinearLayout{
     /**
      * not select color
      */
-    private int mTitleNotSelectColor = 0xffffffff;
+    private int mTitleNotSelectColor = 0xffcccccc;
 
     /**
      * the textview min width
@@ -227,6 +227,9 @@ public class ViewPagerWithHeader extends LinearLayout{
 
         @Override
         public void onPageScrolled(int pos, float positionOffset, int positionOffsetPixels) {
+            if (!mLine.mRenderFinsh) {
+                return;
+            }
             if (mLastPos > pos) {
                 mPullLeft = false;
                 mLastOffset = 1.0f;
@@ -258,8 +261,8 @@ public class ViewPagerWithHeader extends LinearLayout{
                 mPullLeft = true;
                 mLine.setmLastPercent(0);
                 if (pos+1 < mAllTitle.size()) {
-                    TextView next = mAllTitle.get(pos + 1);
-                    mRemain = mTotaloffsetX = next.getLeft() - (mLine.mLeft - mIndicatorMargin);
+                    TextView next = mAllTitle.get(pos+1);
+                    mRemain = mTotaloffsetX = next.getLeft() - (mLine.mLeft-mIndicatorMargin);
                     int nextTipLength = next.getWidth() - mIndicatorMargin * 2;
                     mLine.setNextLength(nextTipLength, mPullLeft, mTotaloffsetX);
                     isMovehead = true;
@@ -280,11 +283,12 @@ public class ViewPagerWithHeader extends LinearLayout{
             if (Math.abs(temp) > 0) {
                 int tempRemain = mRemain;
                 mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
-                int tempHeadMove = mRemain >=0 ? temp : tempRemain;
+                int tempHeadMove = mRemain >=0 ? temp : (mPullLeft ? tempRemain : -tempRemain);
+                tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
                 if (isMovehead && tempRemain>0) {
                     mHorizonView.scrollBy(tempHeadMove, 0);
                 }
-                mLine.scrollBy(temp, positionOffset);
+                mLine.scrollBy(temp, positionOffset-mLastOffset);
                 mLastOffset = positionOffset;
             }
 
@@ -297,10 +301,14 @@ public class ViewPagerWithHeader extends LinearLayout{
             mTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+20;
             int temp = (int) ((mTotaloffsetX) * (positionOffset - mLastOffset));
             if (Math.abs(temp) > 0) {
-                if (isMovehead) {
-                    mHorizonView.scrollBy(temp, 0);
+                int tempRemain = mRemain;
+                mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
+                int tempHeadMove = mRemain >=0 ? temp : tempRemain;
+                tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
+                if (isMovehead && tempRemain>0) {
+                    mHorizonView.scrollBy(tempHeadMove, 0);
                 }
-                mLine.scrollBy(temp, positionOffset);
+                mLine.scrollBy(tempHeadMove, positionOffset-mLastOffset);
             }
         }
 
