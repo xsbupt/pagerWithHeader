@@ -76,7 +76,7 @@ public class IndicatorLineView extends View {
 
     public void scrollBy(int by, float percent) {
         mLeft += by;
-        int tempTotaloffsetX = mTotalOffset == 0 ? 0 : mTotalOffset+20;
+        int tempTotaloffsetX = mTotalOffset == 0 ? 0 : mTotalOffset+mTotalOffset/3;
         int temp = (int) (tempTotaloffsetX * percent);
         if (Math.abs(temp) > 0) {
             int tempRemain = mRemain;
@@ -92,7 +92,6 @@ public class IndicatorLineView extends View {
         } else {
             mLeft = mLeft > mDesireLeft ? mLeft : mDesireLeft;
         }
-
         invalidate();
     }
 

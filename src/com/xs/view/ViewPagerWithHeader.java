@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.HorizontalScrollView;
@@ -36,6 +37,8 @@ public class ViewPagerWithHeader extends LinearLayout{
     private final int INVALID_WIDTH = Integer.MIN_VALUE;
 
     private boolean mSelect = false;
+
+    private int mDesirePos = 0;
 
     /**
      * the text size(using sp)
@@ -183,6 +186,10 @@ public class ViewPagerWithHeader extends LinearLayout{
                     for (int i=0; i<index; i++) {
                         total += mAllTitle.get(i).getWidth();
                     }
+
+                    Log.v("xs", "test--->" + mAllTitle.get(index).getLeft() + "---->" + total);
+
+                    mDesirePos = index;
                     mSelect = true;
                     mHorizonView.smoothScrollTo(total, 0);
                     mViewPager.setCurrentItem(index);
@@ -230,6 +237,7 @@ public class ViewPagerWithHeader extends LinearLayout{
             if (!mLine.mRenderFinsh) {
                 return;
             }
+            Log.v("xs", "pos--->" + pos + "---->" + mLastPos + "---->" + positionOffset);
             if (mLastPos > pos) {
                 mPullLeft = false;
                 mLastOffset = 1.0f;
@@ -276,10 +284,32 @@ public class ViewPagerWithHeader extends LinearLayout{
             }
 
             mLastPos = pos;
-            int tempTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+20;
+            int tempTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+mTotaloffsetX/3;
             int temp = (int) (tempTotaloffsetX * (positionOffset - mLastOffset));
             isMovehead = mSelect ? false : isMovehead;
 
+//            if (Math.abs(temp) > 0) {
+//                int tempRemain = mRemain;
+//                mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
+//                int tempHeadMove = mRemain >=0 ? temp : (mPullLeft ? tempRemain : -tempRemain);
+//                tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
+//                if (isMovehead && tempRemain>0) {
+//                    mHorizonView.scrollBy(tempHeadMove, 0);
+//                }
+//                mLine.scrollBy(temp, positionOffset-mLastOffset);
+//                mLastOffset = positionOffset;
+//            }
+            stepMove(positionOffset);
+
+            if (mListener != null) {
+                mListener.onPageScrolled(pos, positionOffset, positionOffsetPixels);
+            }
+        }
+
+        private void stepMove(float positionOffset) {
+            int tempTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+mTotaloffsetX/3;
+            int temp = (int) ((tempTotaloffsetX) * (positionOffset - mLastOffset));
+            isMovehead = mSelect ? false : isMovehead;
             if (Math.abs(temp) > 0) {
                 int tempRemain = mRemain;
                 mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
@@ -288,27 +318,8 @@ public class ViewPagerWithHeader extends LinearLayout{
                 if (isMovehead && tempRemain>0) {
                     mHorizonView.scrollBy(tempHeadMove, 0);
                 }
-                mLine.scrollBy(temp, positionOffset-mLastOffset);
-                mLastOffset = positionOffset;
-            }
-
-            if (mListener != null) {
-                mListener.onPageScrolled(pos, positionOffset, positionOffsetPixels);
-            }
-        }
-
-        private void stepMove(float positionOffset) {
-            mTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+20;
-            int temp = (int) ((mTotaloffsetX) * (positionOffset - mLastOffset));
-            if (Math.abs(temp) > 0) {
-                int tempRemain = mRemain;
-                mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
-                int tempHeadMove = mRemain >=0 ? temp : tempRemain;
-                tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
-                if (isMovehead && tempRemain>0) {
-                    mHorizonView.scrollBy(tempHeadMove, 0);
-                }
                 mLine.scrollBy(tempHeadMove, positionOffset-mLastOffset);
+                mLastOffset = positionOffset;
             }
         }
 
@@ -325,6 +336,7 @@ public class ViewPagerWithHeader extends LinearLayout{
         @Override
         public void onPageScrollStateChanged(int state) {
             if (state == ViewPager.SCROLL_STATE_IDLE) {
+                mLastPos = mViewPager.getCurrentItem();
                 mDetect = true;
                 mSelect = false;
             }

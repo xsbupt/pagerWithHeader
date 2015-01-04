@@ -32,7 +32,7 @@ public class DemoActivity extends FragmentActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(adapter);
 
-        mHeader.setIndicatorMargin(20);
+        mHeader.setIndicatorMargin(0);
         mHeader.setHeaderData(CONTENT);
         mHeader.setViewPager(mViewPager, null);
     }
