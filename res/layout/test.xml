@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.xs.view.SmoothScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00ffff"
+            android:orientation="vertical"
+            android:focusable="true">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="400px"
+                android:background="#ff00ff" />
+
+            <com.xs.view.ViewPagerWithHeader
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="60px" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="1725px"
+                android:background="#00ff00"/>
+
+        </LinearLayout>
+
+    </com.xs.view.SmoothScrollView>
+
+</LinearLayout>
