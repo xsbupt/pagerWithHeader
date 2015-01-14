@@ -26,7 +26,7 @@ public class DemoActivity extends FragmentActivity {
 
         setContentView(R.layout.demo);
 
-        FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
+        FragmentPagerAdapter adapter = new TestAdapter(getSupportFragmentManager());
 
         mHeader = (ViewPagerWithHeader) findViewById(R.id.header);
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -37,8 +37,8 @@ public class DemoActivity extends FragmentActivity {
         mHeader.setViewPager(mViewPager, null);
     }
 
-    class GoogleMusicAdapter extends FragmentPagerAdapter {
-        public GoogleMusicAdapter(FragmentManager fm) {
+    class TestAdapter extends FragmentPagerAdapter {
+        public TestAdapter(FragmentManager fm) {
             super(fm);
         }
 

@@ -61,6 +61,14 @@ public class IndicatorLineView extends View {
         invalidate();
     }
 
+    public void endMove(int desireLeft, int desireRight) {
+        if (mLeft != desireLeft || mRight != desireRight) {
+            mLeft = desireLeft;
+            mRight = desireRight;
+            invalidate();
+        }
+    }
+
     public void setNextLength(int nextLength, boolean isPullLeft, int total) {
         int mCurrentLength = mRight - mLeft;
         mOffset = isPullLeft ? nextLength - mCurrentLength : mCurrentLength - nextLength;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.HorizontalScrollView;
@@ -94,6 +93,13 @@ public class ViewPagerWithHeader extends LinearLayout{
         Resources r = getResources();
         // title padding
         mTextPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics());
+
+        mHorizonView.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
     }
 
     /**
@@ -186,9 +192,6 @@ public class ViewPagerWithHeader extends LinearLayout{
                     for (int i=0; i<index; i++) {
                         total += mAllTitle.get(i).getWidth();
                     }
-
-                    Log.v("xs", "test--->" + mAllTitle.get(index).getLeft() + "---->" + total);
-
                     mDesirePos = index;
                     mSelect = true;
                     mHorizonView.smoothScrollTo(total, 0);
@@ -237,7 +240,13 @@ public class ViewPagerWithHeader extends LinearLayout{
             if (!mLine.mRenderFinsh) {
                 return;
             }
-            Log.v("xs", "pos--->" + pos + "---->" + mLastPos + "---->" + positionOffset);
+
+            if (mDetect && !mSelect) {
+                if (mHorizonView.getScrollX() != mAllTitle.get(mLastPos).getLeft()) {
+                    mHorizonView.scrollTo(mAllTitle.get(mLastPos).getLeft(), 0);
+                }
+            }
+
             if (mLastPos > pos) {
                 mPullLeft = false;
                 mLastOffset = 1.0f;
@@ -284,23 +293,7 @@ public class ViewPagerWithHeader extends LinearLayout{
             }
 
             mLastPos = pos;
-            int tempTotaloffsetX = mTotaloffsetX == 0 ? 0 : mTotaloffsetX+mTotaloffsetX/3;
-            int temp = (int) (tempTotaloffsetX * (positionOffset - mLastOffset));
-            isMovehead = mSelect ? false : isMovehead;
-
-//            if (Math.abs(temp) > 0) {
-//                int tempRemain = mRemain;
-//                mRemain = mPullLeft ? mRemain - temp : mRemain + temp;
-//                int tempHeadMove = mRemain >=0 ? temp : (mPullLeft ? tempRemain : -tempRemain);
-//                tempHeadMove = tempRemain <0 ? 0: tempHeadMove;
-//                if (isMovehead && tempRemain>0) {
-//                    mHorizonView.scrollBy(tempHeadMove, 0);
-//                }
-//                mLine.scrollBy(temp, positionOffset-mLastOffset);
-//                mLastOffset = positionOffset;
-//            }
             stepMove(positionOffset);
-
             if (mListener != null) {
                 mListener.onPageScrolled(pos, positionOffset, positionOffsetPixels);
             }
@@ -339,6 +332,9 @@ public class ViewPagerWithHeader extends LinearLayout{
                 mLastPos = mViewPager.getCurrentItem();
                 mDetect = true;
                 mSelect = false;
+                int left = mAllTitle.get(mLastPos).getLeft();
+                int width = mAllTitle.get(mLastPos).getWidth();
+                mLine.endMove(left+mIndicatorMargin, left+width-mIndicatorMargin);
             }
             if (mListener != null) {
                 mListener.onPageScrollStateChanged(state);
@@ -351,12 +347,12 @@ public class ViewPagerWithHeader extends LinearLayout{
         for (int i = mCurIndex - 1; i < mAllTitle.size(); i++) {
             if (i >= 0) {
                 tempTotal += mAllTitle.get(i).getWidth();
-                if (tempTotal > mViewPager.getWidth()) {
+                if (tempTotal > mHorizonView.getWidth()) {
                     return true;
                 }
             }
         }
-        if (tempTotal > mViewPager.getWidth()) {
+        if (tempTotal > mHorizonView.getWidth()) {
             return true;
         }
         return false;

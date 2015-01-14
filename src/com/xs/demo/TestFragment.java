@@ -47,7 +47,7 @@ public final class TestFragment extends Fragment {
         text.setPadding(20, 20, 20, 20);
 
         LinearLayout layout = new LinearLayout(getActivity());
-        layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+        layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         layout.setGravity(Gravity.CENTER);
         layout.addView(text);
         if (index %2 == 0) {
